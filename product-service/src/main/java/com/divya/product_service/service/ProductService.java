@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import com.divya.product_service.dto.InventoryResponse;
 import com.divya.product_service.dto.ProductDetailsResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import com.divya.product_service.controller.InventoryClient;
 
 
 @Service
@@ -20,6 +21,7 @@ public class ProductService {
     private final ProductRepository
             productRepository;
         private final RestTemplate restTemplate;
+        private final InventoryClient inventoryClient;
 
     public ProductDto createProduct(
             ProductDto dto) {
@@ -56,11 +58,8 @@ public class ProductService {
                                 .findById(id)
                                 .orElseThrow();
 
-                InventoryResponse inventory =
-                        restTemplate.getForObject(
-                                "http://INVENTORY-SERVICE/inventory/"
-                                        + id,
-                                InventoryResponse.class);
+                InventoryResponse inventory =inventoryClient
+                                                .getInventory(id);
 
                 return ProductDetailsResponse
                         .builder()
